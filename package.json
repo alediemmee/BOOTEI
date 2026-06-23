@@ -1,0 +1,10 @@
+{
+  "name": "bootei-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bootei — sito cinematografico con hero video controllato dallo scroll (sito statico).",
+  "scripts": {
+    "build": "rm -rf dist && cp -r site dist",
+    "dev": "cd site && python -m http.server 8123"
+  }
+}
