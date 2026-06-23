@@ -19,6 +19,7 @@
 
   --maxw: 1280px;
   --pad: clamp(20px, 5vw, 80px);
+  --nav-h: 66px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -35,6 +36,7 @@ html { scroll-behavior: smooth; }
   font-size: 17px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  padding-top: var(--nav-h);
 }
 
 img, video, canvas { display: block; max-width: 100%; }
@@ -45,13 +47,16 @@ a { color: inherit; text-decoration: none; }
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 50;
+  height: var(--nav-h);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px var(--pad);
-  color: var(--white);
-  mix-blend-mode: difference;
-  transition: color .4s ease;
+  padding: 0 var(--pad);
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: saturate(140%) blur(12px);
+  backdrop-filter: saturate(140%) blur(12px);
+  border-bottom: 1px solid var(--line);
 }
 .nav__logo {
   font-family: var(--font-display);
@@ -113,10 +118,10 @@ a { color: inherit; text-decoration: none; }
 
 .stage {
   position: sticky;
-  top: 0;
+  top: var(--nav-h);
   width: 100%;
-  height: 100vh;
-  height: 100svh;
+  height: calc(100vh - var(--nav-h));
+  height: calc(100svh - var(--nav-h));
   overflow: hidden;
   background: var(--ink);
 }
@@ -200,7 +205,7 @@ a { color: inherit; text-decoration: none; }
 .scroll-hint.is-hidden { opacity: 0; }
 
 /* ===================== Sezioni ===================== */
-.section { padding: clamp(80px, 12vh, 160px) var(--pad); }
+.section { padding: clamp(80px, 12vh, 160px) var(--pad); scroll-margin-top: var(--nav-h); }
 .section__head { max-width: var(--maxw); margin: 0 auto; }
 .section__title {
   font-family: var(--font-display);

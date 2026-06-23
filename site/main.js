@@ -212,14 +212,6 @@
      Resto del sito "in movimento": reveal sezioni + colorway grid
      =================================================================== */
 
-  // Header: cambia mix-blend quando si lascia la hero
-  const nav = document.getElementById("nav");
-  window.addEventListener("scroll", () => {
-    const overHero = track.getBoundingClientRect().bottom > window.innerHeight * 0.4;
-    nav.style.mixBlendMode = overHero ? "difference" : "normal";
-    nav.style.color = overHero ? "#fff" : "var(--ink)";
-  }, { passive: true });
-
   // Reveal on scroll
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
