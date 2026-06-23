@@ -37,7 +37,7 @@
 
     <!-- ===== Hero: video controllato dallo scroll ===== -->
     <section class="track" id="track">
-      <div class="stage">
+      <div class="stage stage--hero">
         <video
           id="video"
           class="video-source"
@@ -117,14 +117,66 @@
       </div>
     </section>
 
-    <!-- ===== Collezione ===== -->
-    <section class="section collection" id="collezione">
+    <!-- ===== Collezione: intro ===== -->
+    <section class="section collection collection--intro" id="collezione">
       <div class="section__head reveal" data-reveal>
         <p class="eyebrow">La collezione</p>
         <h2 class="section__title">Nove anime,<br />un solo passo.</h2>
         <a class="link-underline" href="#">Vedi tutto</a>
       </div>
+    </section>
 
+    <!-- ===== 3D scarpa: video controllato dallo scroll ===== -->
+    <section class="track track--shoe" id="track3d">
+      <div class="stage stage--shoe">
+        <video
+          id="video3d"
+          class="video-source"
+          muted
+          playsinline
+          preload="auto"
+          poster="public/shoe-3d-poster.jpg"></video>
+
+        <canvas id="canvas3d" class="video-canvas"></canvas>
+
+        <!-- Capitoli 3D -->
+        <div class="chapter chapter--shoe" data-chapter>
+          <div class="chapter__inner">
+            <p class="chapter__kicker">Bootei in 3D</p>
+            <h2 class="chapter__title">Girala.<br />A 360°.</h2>
+            <p class="chapter__text">Scorri e osserva il sabot da ogni angolazione.</p>
+          </div>
+        </div>
+
+        <div class="chapter chapter--shoe" data-chapter>
+          <div class="chapter__inner">
+            <h2 class="chapter__title">Pelle italiana,<br />cuciture a vista.</h2>
+            <p class="chapter__text">Materiali scelti, lavorazione artigianale.</p>
+          </div>
+        </div>
+
+        <div class="chapter chapter--shoe" data-chapter>
+          <div class="chapter__inner">
+            <h2 class="chapter__title">Una suola<br />pensata per durare.</h2>
+            <p class="chapter__text">Comfort e tenuta, passo dopo passo.</p>
+          </div>
+        </div>
+
+        <div class="chapter chapter--shoe" data-chapter>
+          <div class="chapter__inner chapter__inner--cta">
+            <h2 class="chapter__title">Costruito<br />intorno a te.</h2>
+            <a class="btn" href="#collezione">Scegli il tuo colore</a>
+          </div>
+        </div>
+
+        <div class="hud">
+          <div class="hud__progress"><i id="progress3d"></i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Collezione: griglia prodotti ===== -->
+    <section class="section collection collection--grid">
       <div class="grid" id="grid">
         <!-- popolata via JS -->
       </div>

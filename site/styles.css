@@ -136,11 +136,12 @@ a { color: inherit; text-decoration: none; }
   object-position: center;
 }
 
-/* Mobile / portrait: riempi l'altezza per ingrandire il soggetto.
-   In verticale cover ritaglia i lati, non l'alto/basso: testa e suola restano visibili. */
+/* Mobile / portrait: riempi l'altezza per ingrandire il soggetto della HERO.
+   In verticale cover ritaglia i lati, non l'alto/basso: testa e suola restano visibili.
+   Il 3D scarpa è già verticale: resta contain per non tagliare la scarpa. */
 @media (max-width: 760px), (orientation: portrait) {
-  .video-source,
-  .video-canvas { object-fit: cover; }
+  .stage--hero .video-source,
+  .stage--hero .video-canvas { object-fit: cover; }
 }
 .video-source { pointer-events: none; }
 .video-canvas { display: block; }
@@ -240,6 +241,15 @@ a { color: inherit; text-decoration: none; }
 
 /* Collection */
 .collection { background: var(--sand); }
+.collection--intro { padding-bottom: clamp(48px, 7vh, 90px); }
+.collection--grid { padding-top: clamp(48px, 7vh, 90px); }
+
+/* 3D scarpa — stage cinematografico (sfondo bianco come il video) */
+.stage--shoe { background: #ffffff; }
+.stage--shoe .video-source,
+.stage--shoe .video-canvas { object-fit: contain; }
+.chapter--shoe .chapter__inner { max-width: 30ch; }
+.track--shoe { background: var(--sand); }
 .section__head .link-underline { display: inline-block; margin-top: 22px; }
 .link-underline {
   font-size: 14px; letter-spacing: .04em; border-bottom: 1px solid var(--ink);
