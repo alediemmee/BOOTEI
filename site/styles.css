@@ -135,6 +135,13 @@ a { color: inherit; text-decoration: none; }
   object-fit: contain;
   object-position: center;
 }
+
+/* Mobile / portrait: riempi l'altezza per ingrandire il soggetto.
+   In verticale cover ritaglia i lati, non l'alto/basso: testa e suola restano visibili. */
+@media (max-width: 760px), (orientation: portrait) {
+  .video-source,
+  .video-canvas { object-fit: cover; }
+}
 .video-source { pointer-events: none; }
 .video-canvas { display: block; }
 .video-canvas[hidden] { display: none; }
