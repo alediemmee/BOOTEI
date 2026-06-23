@@ -234,30 +234,32 @@
 
   document.querySelectorAll("[data-reveal]").forEach((el) => io.observe(el));
 
-  // Colorway grid
-  const COLORWAYS = [
-    { name: "Deserto",   bg: "#c9b79c", shoe: "rgba(80,60,40,.35)",  price: 329 },
-    { name: "Asfalto",   bg: "#4a4a4d", shoe: "rgba(0,0,0,.4)",      price: 349 },
-    { name: "Bianco",    bg: "#eceae4", shoe: "rgba(0,0,0,.14)",     price: 329 },
-    { name: "Arancione", bg: "#d9531e", shoe: "rgba(90,30,10,.35)",  price: 369 },
-    { name: "Marrone",   bg: "#6b4a33", shoe: "rgba(0,0,0,.35)",     price: 349 },
-    { name: "Nero",      bg: "#1b1a16", shoe: "rgba(0,0,0,.5)",      price: 389 },
-    { name: "Silice",    bg: "#d8d5cc", shoe: "rgba(0,0,0,.16)",     price: 329 },
+  // Catalogo reale Bootei (nomi, prezzi e foto da bootei.it)
+  const PRODUCTS = [
+    { name: "Sabot Deserto",   img: "deserto.jpg",   price: 389 },
+    { name: "Sabot Asfalto",   img: "asfalto.jpg",   price: 389 },
+    { name: "Sabot Bianco",    img: "bianco.jpg",    price: 329 },
+    { name: "Sabot Arancione", img: "arancione.jpg", price: 389 },
+    { name: "Sabot Marrone",   img: "marrone.jpg",   price: 389 },
+    { name: "Sabot Nero",      img: "nero.jpg",      price: 329 },
+    { name: "Sabot Silice",    img: "silice.jpg",    price: 329 },
+    { name: "Sabot Zinco",     img: "zinco.jpg",     price: 389 },
+    { name: "Sabot Desert",    img: "desert.jpg",    price: 329 },
   ];
 
   const grid = document.getElementById("grid");
   if (grid) {
-    COLORWAYS.forEach((c, i) => {
+    PRODUCTS.forEach((c, i) => {
       const card = document.createElement("article");
       card.className = "card reveal";
       card.setAttribute("data-reveal", "");
       card.dataset.revealDelay = (i % 4) * 80;
       card.innerHTML = `
-        <div class="card__swatch" style="background:${c.bg}">
-          <span class="card__shoe" style="background:${c.shoe}"></span>
+        <div class="card__swatch">
+          <img class="card__img" src="public/products/${c.img}" alt="${c.name}" loading="lazy" />
         </div>
         <div class="card__meta">
-          <span class="card__name">Sabot ${c.name}</span>
+          <span class="card__name">${c.name}</span>
           <span class="card__price">€${c.price}</span>
         </div>`;
       grid.appendChild(card);

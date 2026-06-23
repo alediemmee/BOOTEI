@@ -4,16 +4,18 @@
    =================================================================== */
 
 :root {
-  --bg:      #f4f1ea;   /* Silice / crema */
-  --sand:    #e6dbc9;   /* Deserto */
-  --ink:     #15140f;   /* Nero caldo */
-  --ash:     #6b6760;   /* Asfalto */
-  --accent:  #d9531e;   /* Arancione */
-  --line:    rgba(21, 20, 15, 0.12);
+  /* Palette reale del tema Bootei (Shopify) */
+  --bg:      #ffffff;   /* background primario */
+  --sand:    #d8d5cc;   /* tono neutro Silice (decorativo) */
+  --ink:     #080808;   /* testo primario */
+  --ash:     #6b6760;   /* meta / testo attenuato */
+  --accent:  #25525a;   /* accent verde-petrolio */
+  --dark:    #080808;   /* sfondo sezioni scure */
+  --line:    rgba(8, 8, 8, 0.12);
   --white:   #ffffff;
 
-  --font-display: "Space Grotesk", system-ui, sans-serif;
-  --font-body:    "Inter", system-ui, sans-serif;
+  --font-display: "Arapey", Georgia, serif;
+  --font-body:    "Poppins", system-ui, sans-serif;
 
   --maxw: 1280px;
   --pad: clamp(20px, 5vw, 80px);
@@ -53,7 +55,7 @@ a { color: inherit; text-decoration: none; }
 }
 .nav__logo {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 400;
   font-size: 22px;
   letter-spacing: .14em;
 }
@@ -89,7 +91,7 @@ a { color: inherit; text-decoration: none; }
 }
 .loader.is-done { opacity: 0; visibility: hidden; }
 .loader__mark {
-  font-family: var(--font-display); font-weight: 700;
+  font-family: var(--font-display); font-weight: 400;
   font-size: 26px; letter-spacing: .3em;
 }
 .loader__bar {
@@ -159,9 +161,9 @@ a { color: inherit; text-decoration: none; }
 }
 .chapter__title {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.02;
-  letter-spacing: -.02em;
+  letter-spacing: -.005em;
   font-size: clamp(40px, 7vw, 96px);
   text-shadow: 0 2px 40px rgba(0,0,0,.35);
 }
@@ -202,10 +204,10 @@ a { color: inherit; text-decoration: none; }
 .section__head { max-width: var(--maxw); margin: 0 auto; }
 .section__title {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 400;
   font-size: clamp(34px, 5.5vw, 72px);
   line-height: 1.04;
-  letter-spacing: -.02em;
+  letter-spacing: -.005em;
 }
 .eyebrow {
   font-size: 13px; letter-spacing: .24em; text-transform: uppercase;
@@ -246,19 +248,18 @@ a { color: inherit; text-decoration: none; }
   aspect-ratio: 4 / 5;
   border-radius: 4px;
   overflow: hidden;
+  background: var(--white);
   box-shadow: 0 18px 40px -28px rgba(0,0,0,.5);
-  transition: transform .5s cubic-bezier(.2,.8,.2,1);
+  transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s ease;
 }
-.card:hover .card__swatch { transform: translateY(-8px); }
-.card__shoe {
-  position: absolute; left: 50%; bottom: 22%;
-  width: 62%; height: 30%;
-  transform: translateX(-50%) rotate(-8deg);
-  background: rgba(0,0,0,.18);
-  border-radius: 60% 60% 40% 40% / 80% 80% 30% 30%;
-  filter: blur(.3px);
-  box-shadow: inset 0 -6px 14px rgba(0,0,0,.25), 0 10px 18px -10px rgba(0,0,0,.5);
+.card:hover .card__swatch { transform: translateY(-8px); box-shadow: 0 28px 50px -26px rgba(0,0,0,.55); }
+.card__img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .7s cubic-bezier(.2,.8,.2,1);
 }
+.card:hover .card__img { transform: scale(1.05); }
 .card__meta {
   display: flex; justify-content: space-between; align-items: baseline;
   margin-top: 14px; font-size: 15px;
@@ -273,8 +274,8 @@ a { color: inherit; text-decoration: none; }
 }
 .inspire__inner { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
 .inspire__title {
-  font-family: var(--font-display); font-weight: 700;
-  font-size: clamp(40px, 7vw, 92px); line-height: 1.02; letter-spacing: -.02em;
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(40px, 7vw, 92px); line-height: 1.02; letter-spacing: -.005em;
   margin-bottom: 36px;
 }
 
@@ -315,7 +316,7 @@ a { color: inherit; text-decoration: none; }
   display: flex; align-items: baseline; gap: 28px; flex-wrap: wrap;
   padding-bottom: 50px; border-bottom: 1px solid rgba(244,241,234,.14);
 }
-.footer__logo { font-family: var(--font-display); font-weight: 700; font-size: clamp(44px,9vw,120px); letter-spacing: .04em; }
+.footer__logo { font-family: var(--font-display); font-weight: 400; font-size: clamp(44px,9vw,120px); letter-spacing: .04em; }
 .footer__claim { color: var(--sand); font-size: 16px; }
 .footer__cols {
   max-width: var(--maxw); margin: 50px auto 0;
