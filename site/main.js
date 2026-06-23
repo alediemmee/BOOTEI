@@ -179,7 +179,17 @@
     raf = requestAnimationFrame(loop);
   }
 
-  /* ---------------- Caricamento via Blob ---------------- */
+  /* ---------------- Caricamento video ----------------
+     Due strategie, scelte in base al motore:
+     - Safari/WebKit: URL diretto. Un blob: rompe lo scrubbing su WebKit, che
+       decodifica e fa seeking in modo affidabile solo da una sorgente reale.
+     - Chromium/Firefox: blob in memoria. Lo scrubbing via seek non dipende così
+       dalle richieste HTTP Range, che non tutti i server (es. quello di sviluppo)
+       gestiscono: senza Range, Chromium non riesce a fare seek dall'URL diretto. */
+  const ua = navigator.userAgent;
+  const isAppleWebKit =
+    /AppleWebKit/.test(ua) && !/Chrome|Chromium|CriOS|Edg|Android/.test(ua);
+
   async function loadVideoAsBlob() {
     try {
       const res = await fetch(VIDEO_SRC);
@@ -188,10 +198,18 @@
       video.src = URL.createObjectURL(blob);
       video.load();
     } catch (err) {
-      // Fallback: URL diretto
       console.warn("Blob load fallito, uso URL diretto:", err);
       video.src = VIDEO_SRC;
       video.load();
+    }
+  }
+
+  function loadVideo() {
+    if (isAppleWebKit) {
+      video.src = VIDEO_SRC;
+      video.load();
+    } else {
+      loadVideoAsBlob();
     }
   }
 
@@ -214,7 +232,7 @@
   // Safety: se gli eventi tardano, non lasciare il loader bloccato
   setTimeout(() => { if (!mediaReady) loader.classList.add("is-done"); }, 6000);
 
-  loadVideoAsBlob();
+  loadVideo();
   raf = requestAnimationFrame(loop);
 
   /* ===================================================================
