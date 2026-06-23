@@ -155,8 +155,8 @@
     }
   }
 
-  /* ---------------- Loop principale ---------------- */
-  function loop() {
+  /* ---------------- Render (una passata) ---------------- */
+  function render() {
     const p = getProgress();
 
     if (duration && video.readyState >= 1) {
@@ -171,7 +171,11 @@
     if (scrollHint) {
       scrollHint.classList.toggle("is-hidden", p > 0.04);
     }
+  }
 
+  /* ---------------- Loop principale ---------------- */
+  function loop() {
+    render();
     raf = requestAnimationFrame(loop);
   }
 
@@ -201,6 +205,11 @@
   window.addEventListener("resize", applyTrackHeight, { passive: true });
   window.addEventListener("pointerdown", primeDecoder, { passive: true });
   window.addEventListener("touchstart", primeDecoder, { passive: true });
+
+  // Su iOS Safari il requestAnimationFrame viene sospeso durante lo scroll touch:
+  // pilotiamo lo scrub anche dagli eventi di scroll, così funziona ovunque.
+  window.addEventListener("scroll", render, { passive: true });
+  window.addEventListener("touchmove", render, { passive: true });
 
   // Safety: se gli eventi tardano, non lasciare il loader bloccato
   setTimeout(() => { if (!mediaReady) loader.classList.add("is-done"); }, 6000);
