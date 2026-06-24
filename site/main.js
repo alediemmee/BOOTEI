@@ -47,6 +47,9 @@
     let decoderPrimed = false;
     let raf = 0;
 
+    // contatori per debug
+    const dbg = { loadeddata: 0, canplay: 0, seeked: 0, seekIssued: 0, scroll: 0, touchmove: 0, raf: 0, watchdog: 0 };
+
     function applyTrackHeight() {
       if (!duration) return;
       track.style.height =
@@ -64,11 +67,12 @@
       if (seeking) return;
       if (Math.abs(time - video.currentTime) < 0.01) return;
       seeking = true;
+      dbg.seekIssued++;
       // Watchdog: Firefox (specie mobile/APZ) può accorpare o scartare un seek
       // senza emettere "seeked", lasciando il flag bloccato per sempre. Lo
       // sblocchiamo dopo un attimo così il loop può riprovare verso desiredTime.
       clearTimeout(seekWatchdog);
-      seekWatchdog = setTimeout(() => { seeking = false; }, 220);
+      seekWatchdog = setTimeout(() => { seeking = false; dbg.watchdog++; }, 220);
       try {
         video.currentTime = time;
       } catch {
@@ -80,6 +84,7 @@
     function onSeeked() {
       clearTimeout(seekWatchdog);
       seeking = false;
+      dbg.seeked++;
       paintFrame();
       if (Math.abs(desiredTime - video.currentTime) > 0.01) {
         seekTo(desiredTime);
@@ -167,6 +172,7 @@
     }
 
     function loop() {
+      dbg.raf++;
       render();
       raf = requestAnimationFrame(loop);
     }
@@ -196,26 +202,46 @@
     // Listeners
     video.addEventListener("loadedmetadata", readDuration);
     video.addEventListener("durationchange", readDuration);
-    video.addEventListener("loadeddata", onMediaReady);
-    video.addEventListener("canplay", onMediaReady);
+    video.addEventListener("loadeddata", () => { dbg.loadeddata++; onMediaReady(); });
+    video.addEventListener("canplay", () => { dbg.canplay++; onMediaReady(); });
     video.addEventListener("seeked", onSeeked);
 
     window.addEventListener("resize", applyTrackHeight, { passive: true });
     window.addEventListener("pointerdown", primeDecoder, { passive: true });
     window.addEventListener("touchstart", primeDecoder, { passive: true });
     // iOS Safari sospende il RAF durante lo scroll touch: pilotiamo anche da scroll.
-    window.addEventListener("scroll", render, { passive: true });
-    window.addEventListener("touchmove", render, { passive: true });
+    window.addEventListener("scroll", () => { dbg.scroll++; render(); }, { passive: true });
+    window.addEventListener("touchmove", () => { dbg.touchmove++; render(); }, { passive: true });
 
     load();
     raf = requestAnimationFrame(loop);
+
+    // API di stato per il pannello di debug
+    return {
+      snapshot() {
+        return {
+          dur: duration ? +duration.toFixed(2) : null,
+          rs: video.readyState,
+          vw: video.videoWidth,
+          err: video.error ? video.error.code : null,
+          trackH: track.offsetHeight,
+          winH: window.innerHeight,
+          prog: +getProgress().toFixed(3),
+          want: +desiredTime.toFixed(2),
+          ct: +video.currentTime.toFixed(2),
+          flagSeek: seeking,
+          natSeek: video.seeking,
+          ...dbg,
+        };
+      },
+    };
   }
 
   /* ===================================================================
      Istanza 1 — Hero
      =================================================================== */
   const loader = document.getElementById("loader");
-  createScrollVideo({
+  const heroApi = createScrollVideo({
     src: "public/hero-motion.mp4",
     track: document.getElementById("track"),
     video: document.getElementById("video"),
@@ -240,7 +266,7 @@
   /* ===================================================================
      Istanza 2 — 3D scarpa (cinematic)
      =================================================================== */
-  createScrollVideo({
+  const shoeApi = createScrollVideo({
     src: "public/shoe-3d.mp4",
     track: document.getElementById("track3d"),
     video: document.getElementById("video3d"),
@@ -255,6 +281,41 @@
       { in:  0.84, hold0: 0.92, hold1: 1.00, out: 1.01 },
     ],
   });
+
+  /* ===================================================================
+     Pannello di debug — attivo solo con ?debug nell'URL
+     =================================================================== */
+  if (/(\?|&|#)debug/.test(location.href)) {
+    const panel = document.createElement("pre");
+    panel.id = "dbgPanel";
+    panel.style.cssText =
+      "position:fixed;left:0;right:0;bottom:0;z-index:9999;margin:0;" +
+      "max-height:46vh;overflow:auto;background:rgba(0,0,0,.86);color:#0f0;" +
+      "font:11px/1.35 ui-monospace,Menlo,Consolas,monospace;padding:8px 10px;" +
+      "white-space:pre-wrap;border-top:2px solid #0f0;-webkit-user-select:text;user-select:text;";
+    document.body.appendChild(panel);
+
+    const fmt = (label, s) =>
+      `■ ${label}\n` +
+      `  load: dur=${s.dur} rs=${s.rs} vw=${s.vw} err=${s.err}\n` +
+      `  track=${s.trackH} win=${s.winH} scrollRoom=${s.trackH - s.winH}\n` +
+      `  prog=${s.prog} want=${s.want}s ct=${s.ct}s\n` +
+      `  seekFlag=${s.flagSeek} nativeSeeking=${s.natSeek}\n` +
+      `  ev: loadeddata=${s.loadeddata} canplay=${s.canplay} seeked=${s.seeked} seekIssued=${s.seekIssued} watchdog=${s.watchdog}\n` +
+      `  drive: raf=${s.raf} scroll=${s.scroll} touchmove=${s.touchmove}`;
+
+    function tick() {
+      const ua = navigator.userAgent;
+      let txt = "BOOTEI debug — " + ua + "\n";
+      txt += "scrollY=" + Math.round(window.scrollY) + " innerH=" + window.innerHeight +
+             " docH=" + document.documentElement.scrollHeight + "\n\n";
+      if (heroApi) txt += fmt("HERO", heroApi.snapshot()) + "\n\n";
+      if (shoeApi) txt += fmt("3D SCARPA", shoeApi.snapshot());
+      panel.textContent = txt;
+      setTimeout(tick, 250);
+    }
+    tick();
+  }
 
   /* ===================================================================
      Resto del sito "in movimento": reveal sezioni + colorway grid
