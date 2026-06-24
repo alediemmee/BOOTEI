@@ -686,3 +686,33 @@ Controllare:
 10. Prima si verifica il deploy, poi si modifica il codice.
 
 Implementazione di riferimento: `ipr-site/src/App.jsx` e `ipr-site/src/App.css`.
+
+---
+
+## 20. Note cross-browser (dal campo)
+
+Lezioni verificate su Chromium, Firefox e WebKit (desktop e mobile).
+
+**Sorgente video per motore.** La scelta è critica per lo scrubbing:
+
+- Safari/WebKit: usare l'**URL diretto**. Un `blob:` rompe il seek su WebKit, che decodifica e cerca in modo affidabile solo da una sorgente reale con Range.
+- Chromium/Firefox: usare il **blob** in memoria. Lo scrub via seek non dipende così dalle richieste HTTP Range: su un server senza Range (es. quello di sviluppo) Chromium **non** riesce a fare seek dall'URL diretto (`currentTime` resta a 0).
+
+```js
+const isAppleWebKit =
+  /AppleWebKit/.test(ua) && !/Chrome|Chromium|CriOS|Edg|Android/.test(ua);
+```
+
+**Seek bloccato (Firefox, specie mobile/APZ).** Durante lo scroll Firefox può accorpare o scartare un seek **senza emettere `seeked`**, lasciando il flag `seeking = true` per sempre: il video si congela sul primo frame. Difese:
+
+- Watchdog: sblocca il flag se `seeked` non arriva entro ~220 ms.
+- Riconciliazione: nel loop, se `seeking` è true ma `video.seeking` è false (dopo ~120 ms), sblocca.
+
+**Scrub mobile guidato da più sorgenti.** iOS Safari e Firefox/APZ rallentano `requestAnimationFrame` durante lo scroll touch. Pilotare il render anche da `scroll` e `touchmove` (passivi) e tenere un **backstop** a bassa frequenza (`setInterval`, ~250 ms) che fa comunque convergere il video alla posizione di scroll.
+
+**Robustezza extra.**
+
+- `pageshow`: al ritorno da bfcache (back/forward mobile) ri-eseguire priming e render.
+- Retry: se il media non è pronto dopo qualche secondo, ricaricare una volta dall'URL diretto.
+
+**Debug sul dispositivo.** Un problema solo-mobile non è ispezionabile da remoto: esporre un pannello on-screen (attivo con `?debug`) che mostra `duration`, `readyState`, spazio di scroll, `currentTime`, flag di seek e contatori di `raf`/`scroll`/`touchmove`. Rivela in un colpo a quale stadio si rompe.
