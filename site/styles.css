@@ -4,6 +4,9 @@
    =================================================================== */
 
 :root {
+  /* Versione sempre chiara: niente modalità notte del browser */
+  color-scheme: light only;
+
   /* Palette reale del tema Bootei (Shopify) */
   --bg:      #ffffff;   /* background primario */
   --sand:    #d8d5cc;   /* tono neutro Silice (decorativo) */
