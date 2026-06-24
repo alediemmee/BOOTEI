@@ -42,6 +42,7 @@
     let duration = 0;
     let desiredTime = 0;
     let seeking = false;
+    let seekWatchdog = 0;
     let mediaReady = false;
     let decoderPrimed = false;
     let raf = 0;
@@ -63,14 +64,21 @@
       if (seeking) return;
       if (Math.abs(time - video.currentTime) < 0.01) return;
       seeking = true;
+      // Watchdog: Firefox (specie mobile/APZ) può accorpare o scartare un seek
+      // senza emettere "seeked", lasciando il flag bloccato per sempre. Lo
+      // sblocchiamo dopo un attimo così il loop può riprovare verso desiredTime.
+      clearTimeout(seekWatchdog);
+      seekWatchdog = setTimeout(() => { seeking = false; }, 220);
       try {
         video.currentTime = time;
       } catch {
         seeking = false;
+        clearTimeout(seekWatchdog);
       }
     }
 
     function onSeeked() {
+      clearTimeout(seekWatchdog);
       seeking = false;
       paintFrame();
       if (Math.abs(desiredTime - video.currentTime) > 0.01) {
