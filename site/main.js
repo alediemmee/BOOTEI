@@ -43,8 +43,10 @@
     let desiredTime = 0;
     let seeking = false;
     let seekWatchdog = 0;
+    let lastSeekAt = 0;
     let mediaReady = false;
     let decoderPrimed = false;
+    let loadFallbackDone = false;
     let raf = 0;
 
     // contatori per debug
@@ -72,6 +74,7 @@
       // senza emettere "seeked", lasciando il flag bloccato per sempre. Lo
       // sblocchiamo dopo un attimo così il loop può riprovare verso desiredTime.
       clearTimeout(seekWatchdog);
+      lastSeekAt = performance.now();
       seekWatchdog = setTimeout(() => { seeking = false; dbg.watchdog++; }, 220);
       try {
         video.currentTime = time;
@@ -160,6 +163,13 @@
     }
 
     function render() {
+      // Recupero: se il nostro flag è ancora "seeking" ma il browser non sta
+      // più cercando (evento "seeked" perso, tipico di Firefox/APZ), sblocca.
+      if (seeking && !video.seeking && performance.now() - lastSeekAt > 120) {
+        seeking = false;
+        clearTimeout(seekWatchdog);
+      }
+
       const p = getProgress();
       if (duration && video.readyState >= 1) {
         desiredTime = p * Math.max(0, duration - 0.04);
@@ -212,6 +222,27 @@
     // iOS Safari sospende il RAF durante lo scroll touch: pilotiamo anche da scroll.
     window.addEventListener("scroll", () => { dbg.scroll++; render(); }, { passive: true });
     window.addEventListener("touchmove", () => { dbg.touchmove++; render(); }, { passive: true });
+
+    // Backstop: se RAF, scroll e touchmove vengono tutti rallentati (mobile),
+    // questo tick a bassa frequenza fa comunque convergere il video allo scroll.
+    setInterval(render, 250);
+
+    // Ritorno da bfcache (back/forward su mobile): ri-priming e re-render.
+    window.addEventListener("pageshow", () => {
+      decoderPrimed = false;
+      primeDecoder();
+      render();
+    });
+
+    // Se il video non è pronto dopo qualche secondo (blob lento o bloccato),
+    // riprova una volta dall'URL diretto.
+    setTimeout(() => {
+      if (!mediaReady && !loadFallbackDone) {
+        loadFallbackDone = true;
+        video.src = src;
+        video.load();
+      }
+    }, 4500);
 
     load();
     raf = requestAnimationFrame(loop);
